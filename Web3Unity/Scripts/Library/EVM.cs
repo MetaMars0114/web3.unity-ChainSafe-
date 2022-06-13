@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Models;
@@ -96,7 +97,7 @@ public class EVM
             return data.response;
         }
     }
-    
+
     public static async Task<CreateMintModel.Response> CreateMint(string _chain, string _network, string _account, string _to, string _cid)
     {
         WWWForm form = new WWWForm();
@@ -110,6 +111,84 @@ public class EVM
         {
             await webRequest.SendWebRequest();
             CreateMintModel.Root data = JsonUtility.FromJson<CreateMintModel.Root>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
+            return data.response;
+        }
+    }
+    public static async Task<List<GetNftListModel.Response>> GetNftMarket(string _chain, string _network)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("chain", _chain);
+        form.AddField("network", _network);
+        string url = host + "/getListedNfts";
+        using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
+        {
+            await webRequest.SendWebRequest();
+            GetNftListModel.Root data = JsonUtility.FromJson<GetNftListModel.Root>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
+            return data.response;
+        }
+    }
+
+    public static async Task<List<GetNftListModel.Response>> CreatePurchaseNftTransaction(string _chain, string _network, string _account, string _itemId, string _price)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("chain", _chain);
+        form.AddField("network", _network);
+        form.AddField("account", _account);
+        form.AddField("itemId", _itemId);
+        form.AddField("price", _price);
+        string url = host + "/createPurchaseNftTransaction";
+        using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
+        {
+            await webRequest.SendWebRequest();
+            GetNftListModel.Root data = JsonUtility.FromJson<GetNftListModel.Root>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
+            return data.response;
+        }
+    }
+
+    public static async Task<List<GetNftListModel.Response>> CreateListNftTransaction(string _chain, string _network, string _account, string _tokenId, string _priceHex)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("chain", _chain);
+        form.AddField("network", _network);
+        form.AddField("account", _account);
+        form.AddField("tokenId", _tokenId);
+        form.AddField("priceHex", _priceHex);
+        string url = host + "/createListNftTransaction";
+        using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
+        {
+            await webRequest.SendWebRequest();
+            GetNftListModel.Root data = JsonUtility.FromJson<GetNftListModel.Root>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
+            return data.response;
+        }
+    }
+
+    public static async Task<List<GetNftListModel.Response>> CreateCancelNftTransaction(string _chain, string _network, string _account, string _itemId)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("chain", _chain);
+        form.AddField("network", _network);
+        form.AddField("account", _account);
+        form.AddField("tokenId", _itemId);
+        string url = host + "/createCancelNftTransaction";
+        using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
+        {
+            await webRequest.SendWebRequest();
+            GetNftListModel.Root data = JsonUtility.FromJson<GetNftListModel.Root>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
+            return data.response;
+        }
+    }
+
+    public static async Task<List<GetNftListModel.Response>> CreateApproveTransaction(string _chain, string _network, string _account)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("chain", _chain);
+        form.AddField("network", _network);
+        form.AddField("account", _account);
+        string url = host + "/createApproveTransaction";
+        using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
+        {
+            await webRequest.SendWebRequest();
+            GetNftListModel.Root data = JsonUtility.FromJson<GetNftListModel.Root>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
     }
