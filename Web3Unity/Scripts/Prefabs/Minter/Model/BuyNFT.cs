@@ -1,11 +1,17 @@
 using System;
-namespace  Models
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+namespace Models
 {
-    public class CreateMintModel
+    public class BuyNFT
     {
         [Serializable]
         public class Connection
         {
+            public string rpc;
             public string chain;
             public string network;
         }
@@ -14,16 +20,12 @@ namespace  Models
         {
             public string hashedUnsignedTx;
             public Connection connection;
-            public string cid;
             public Tx tx;
         }
         [Serializable]
         public class Root
         {
-            public Response response; 
-            public override string ToString(){
-                return UnityEngine.JsonUtility.ToJson (this, true);
-            }
+            public Response response;
         }
         [Serializable]
         public class Tx
@@ -35,17 +37,5 @@ namespace  Models
             public string gasPrice;
             public string gasLimit;
         }
-    }
-    [Serializable]
-    public class MintNFT
-    {
-        public string chain;
-
-        public string network;
-
-        public string account;
-
-        public string to;
-        public string cid;
     }
 }
