@@ -21,8 +21,8 @@ public class GetListedNFts : MonoBehaviour
     public Text contractAddr;
     public Text tokenId;
     public Text itemId;
-    private string itemPrice = "";
-    private string itemNum;
+    private string _itemPrice = "";
+    private string _itemNum;
     // Start is called before the first frame update
     async void Start()
     {
@@ -49,13 +49,19 @@ public class GetListedNFts : MonoBehaviour
             {
                 imageUri = imageUri.Replace("ipfs://", "https://ipfs.io/ipfs/");
                 Debug.Log("Image" + imageUri);
-                UnityWebRequest textureRequest = UnityWebRequestTexture.GetTexture(imageUri);
-                await textureRequest.SendWebRequest();
-                textureObject.material.mainTexture = ((DownloadHandlerTexture)textureRequest.downloadHandler).texture;
+                StartCoroutine(DownloadImage(imageUri));
             }
             if (data.properties != null)
             {
                 print("Properties : " + data.properties);
+                foreach (var prop in data.properties.additionalFiles)
+                {
+                    if (prop.StartsWith("ipfs://"))
+                    {
+                        var additionalURi = prop.Replace("ipfs://", "https://ipfs.io/ipfs/");
+                        Debug.Log("Additional Files: " + additionalURi);
+                    }
+                }
             }
 
             print("Listed Percentage: " + response[0].listedPercentage);
@@ -65,9 +71,27 @@ public class GetListedNFts : MonoBehaviour
             print("Token ID: " + response[0].tokenId);
             print("Item ID: " + response[0].itemId);
             itemId.text = response[0].itemId;
-            itemNum = response[0].itemId;
-            itemPrice = response[0].price;
+            _itemNum = response[0].itemId;
+            _itemPrice = response[0].price;
             tokenId.text = response[0].tokenId;
+    }
+    
+    // ReSharper disable Unity.PerformanceAnalysis
+    IEnumerator DownloadImage(string MediaUrl)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(MediaUrl);
+        yield return request.SendWebRequest();
+        if (request.isNetworkError || request.isHttpError)
+            Debug.Log(request.error);
+        else{
+            Texture2D webTexture = ((DownloadHandlerTexture)request.downloadHandler).texture as Texture2D;
+            Sprite webSprite = SpriteFromTexture2D(webTexture);
+            textureObject.GetComponent<Image>().sprite = webSprite;
+   
+        }
+    }
+    Sprite SpriteFromTexture2D(Texture2D texture) {
+        return Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
     }
 
     
@@ -76,9 +100,9 @@ public class GetListedNFts : MonoBehaviour
         Debug.Log("Chain PurchaseItem: " + chain);
         Debug.Log("Network PurchaseItem: " + network);
         Debug.Log("Account PurchaseItem: " + PlayerPrefs.GetString("Account"));
-        Debug.Log("ItenID PurchaseItem: " + itemNum);
-        Debug.Log("ItemPrice PurchaseItem: " + itemPrice);
-        BuyNFT.Response response = await EVM.CreatePurchaseNftTransaction(chain, network, PlayerPrefs.GetString("Account"), itemNum, itemPrice);
+        Debug.Log("ItenID PurchaseItem: " + _itemNum);
+        Debug.Log("ItemPrice PurchaseItem: " + _itemPrice);
+        BuyNFT.Response response = await EVM.CreatePurchaseNftTransaction(chain, network, PlayerPrefs.GetString("Account"), _itemNum, _itemPrice);
         Debug.Log("Account : " + response.tx.account);
         Debug.Log("To : " + response.tx.to);
         Debug.Log("Value : " + response.tx.value);
